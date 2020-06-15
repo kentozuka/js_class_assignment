@@ -58,7 +58,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function selected(target) {
   const name = document.getElementById('country-selection').value
   const api = await axios.get(`https://api.covid19api.com/country/${name}`)
-  console.log(api.data)
   const conf = api.data.map(x => x.Confirmed)
   const deat = api.data.map(x => x.Deaths)
   const reco = api.data.map(x => x.Recovered)
