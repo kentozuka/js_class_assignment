@@ -66,46 +66,48 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function selected(target, map) {
   const name = document.getElementById('country-selection').value
   const api = await axios.get(`https://api.covid19api.com/country/${name}`)
-  // for leaflet
-  const lat = api.data ? api.data[0].Lat : '0'
-  const lon = api.data ? api.data[0].Lon : '0'
-  const pss = [lat, lon]
+  if (api.status === 200) {
+    // for leaflet
+    const lat = api.data ? api.data[0].Lat : '0'
+    const lon = api.data ? api.data[0].Lon : '0'
+    const pss = [lat, lon]
 
-  const conf = api.data.map(x => x.Confirmed)
-  const deat = api.data.map(x => x.Deaths)
-  const reco = api.data.map(x => x.Recovered)
-  const dates = api.data.map(x => {
-    const dt = new Date(x.Date)
-    return `${dt.getMonth() + 1}/${dt.getDate()}`
-  })
+    const conf = api.data.map(x => x.Confirmed)
+    const deat = api.data.map(x => x.Deaths)
+    const reco = api.data.map(x => x.Recovered)
+    const dates = api.data.map(x => {
+      const dt = new Date(x.Date)
+      return `${dt.getMonth() + 1}/${dt.getDate()}`
+    })
 
-  const size = {
-    conf: (conf[conf.length - 1] / totals().conf) * 10000000,
-    deat: (deat[deat.length - 1] / totals().deat) * 10000000,
-    reco: (reco[reco.length - 1] / totals().reco) * 10000000
+    const size = {
+      conf: (conf[conf.length - 1] / totals().conf) * 10000000,
+      deat: (deat[deat.length - 1] / totals().deat) * 10000000,
+      reco: (reco[reco.length - 1] / totals().reco) * 10000000
+    }
+    circles(map, size, pss)
+
+    // modifying chart
+    const sets = [{
+      label: 'Confirmed',
+      data: conf,
+      borderColor: 'rgba(0, 0, 255, 0.2)',
+      backgroundColor: 'rgba(0, 0, 0, 0)'
+    }, {
+      label: 'Death',
+      data: deat,
+      borderColor: 'rgba(255, 0, 0, 0.2)',
+      backgroundColor: 'rgba(0, 0, 0, 0)'
+    }, {
+      label: 'Recovered',
+      data: reco,
+      borderColor: 'rgba(0, 255, 0, 0.2)',
+      backgroundColor: 'rgba(0, 0, 0, 0)'
+    }]
+    chart(target, sets, dates)
+    // manipulating leaflets
+    if (lat && lon) map.panTo(pss)
   }
-  circles(map, size, pss)
-
-  // modifying chart
-  const sets = [{
-    label: 'Confirmed',
-    data: conf,
-    borderColor: 'rgba(0, 0, 255, 0.2)',
-    backgroundColor: 'rgba(0, 0, 0, 0)'
-  }, {
-    label: 'Death',
-    data: deat,
-    borderColor: 'rgba(255, 0, 0, 0.2)',
-    backgroundColor: 'rgba(0, 0, 0, 0)'
-  }, {
-    label: 'Recovered',
-    data: reco,
-    borderColor: 'rgba(0, 255, 0, 0.2)',
-    backgroundColor: 'rgba(0, 0, 0, 0)'
-  }]
-  chart(target, sets, dates)
-  // manipulating leaflets
-  if (lat && lon) map.panTo(pss)
 }
 
 function circles(map, size, pss) {
@@ -126,7 +128,7 @@ function circles(map, size, pss) {
       color: colors.border[em],
       fillColor: colors.fill[em],
       fillOpacity: 0.2,
-      radius: size[em],
+      radius: size[em]
     }).addTo(map)
   }
 }
