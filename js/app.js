@@ -66,16 +66,29 @@ async function selected(target) {
     const dt = new Date(x.Date)
     return `${dt.getMonth() + 1}/${dt.getDate()}`
   })
-  chart(target, conf, dates)
+  const sets = [{
+    label: 'Confirmed',
+    data: conf,
+    borderColor: 'rgba(0, 0, 255, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0)'
+  }, {
+    label: 'Death',
+    data: deat,
+    borderColor: 'rgba(255, 0, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0)'
+  }, {
+    label: 'Recovered',
+    data: reco,
+    borderColor: 'rgba(0, 255, 0, 0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0)'
+  }]
+  chart(target, sets, dates)
 }
 
-function chart(chart, data, labels) {
+function chart(chart, datasets, labels) {
   chart.data = {
     labels,
-    datasets: [{
-      label: '# of Cases',
-      data
-    }]
+    datasets
   }
   chart.update()
 }
